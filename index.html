@@ -40,8 +40,8 @@ nav.s{background:rgba(8,8,8,.82);backdrop-filter:blur(18px);-webkit-backdrop-fil
 .bg{display:none;width:44px;height:44px;position:relative;z-index:120}.bg i{position:absolute;left:10px;right:10px;height:2px;background:var(--i);transition:transform .4s var(--e)}
 .bg i:first-child{top:16px}.bg i:last-child{top:26px}
 .menu .bg i:first-child{transform:translateY(5px) rotate(45deg)}.menu .bg i:last-child{transform:translateY(-5px) rotate(-45deg)}
-@media(max-width:860px){.bg{display:block}.nl{position:fixed;inset:0;background:var(--k);flex-direction:column;justify-content:center;gap:26px;transform:translateY(-100%);transition:transform .6s var(--e);z-index:110}
-.menu .nl{transform:none}.nl a{font:900 40px var(--d);letter-spacing:0;text-transform:uppercase}.nl .cta{font:600 18px var(--s);letter-spacing:.18em;padding:14px 26px}}
+@media(max-width:860px){.bg{display:block}.nl{position:fixed;inset:0;background:var(--k);flex-direction:column;justify-content:center;gap:26px;height:100svh;max-height:100svh;overflow-y:auto;overscroll-behavior:contain;padding:calc(env(safe-area-inset-top,0px) + 72px) 20px calc(env(safe-area-inset-bottom,0px) + 30px);transform:translateY(-100%);transition:transform .6s var(--e);z-index:110;pointer-events:none}
+.menu .nl{transform:none;pointer-events:auto}.nl a{font:900 40px var(--d);letter-spacing:0;text-transform:uppercase}.nl .cta{font:600 18px var(--s);letter-spacing:.18em;padding:14px 26px}}
 /* buttons */
 .btn{display:inline-flex;align-items:center;gap:12px;padding:20px 34px;font:700 15px var(--s);letter-spacing:.2em;text-transform:uppercase;border:1.5px solid rgba(244,239,232,.35);transition:background .3s,border-color .3s,color .3s;will-change:transform}
 .btn.p{background:var(--c);border-color:var(--c)}.btn:hover{border-color:var(--c);color:var(--c)}.btn.p:hover{background:var(--i);color:var(--k);border-color:var(--i)}
@@ -89,7 +89,7 @@ nav.s{background:rgba(8,8,8,.82);backdrop-filter:blur(18px);-webkit-backdrop-fil
 /* clients */
 #clients{padding:clamp(80px,10vw,150px) 0;overflow:hidden}
 .mq{margin-top:clamp(40px,6vw,80px);border-block:1px solid var(--l);padding:34px 0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
-.mt{display:flex;width:max-content;animation:mq 38s linear infinite}.mq:hover .mt,.mq:focus-within .mt{animation-play-state:paused}
+.mt{display:flex;width:max-content;animation:mq 18s linear infinite}.mq:hover .mt,.mq:focus-within .mt{animation-play-state:paused}
 .mt a,.mt span{display:block;flex:none;margin-right:clamp(36px,5vw,80px)}
 .mt img{width:clamp(110px,12vw,170px);aspect-ratio:1;border-radius:50%;filter:grayscale(1);opacity:.62;transition:filter .5s,opacity .5s,transform .5s var(--e)}
 .mt span:hover img{filter:none;opacity:1;transform:scale(1.1)}
@@ -103,10 +103,11 @@ nav.s{background:rgba(8,8,8,.82);backdrop-filter:blur(18px);-webkit-backdrop-fil
 .pin.nat{overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}.pin.nat .tr{width:max-content}.pin.nat figure{scroll-snap-align:center}
 figure{flex:none;position:relative;cursor:zoom-in;background:#fff;overflow:hidden;border:1px solid var(--l)}
 figure img{height:clamp(280px,56vh,540px);width:auto;max-width:none;transition:transform .9s var(--e)}
-figure:hover img{transform:scale(1.06)}
+figure:hover img{transform:none}
 figcaption{position:absolute;left:0;right:0;bottom:0;padding:34px 16px 14px;background:linear-gradient(transparent,rgba(8,8,8,.9));font:400 11px var(--m);letter-spacing:.06em;color:var(--i);transform:translateY(60%);opacity:0;transition:transform .5s var(--e),opacity .5s}
 figure:hover figcaption,figure:focus-visible figcaption{transform:none;opacity:1}
-@media(hover:none){figcaption{transform:none;opacity:1}}
+@media(hover:none){figcaption{transform:none;opacity:1}.mq:hover .mt{animation-play-state:running}}
+@media(max-width:860px){.pin.nat figure{width:calc(100vw - 40px);max-width:560px}.pin.nat figure img{width:100%;height:auto;max-width:100%;max-height:70svh;object-fit:contain}}
 .rn{padding:0 clamp(20px,4vw,64px) 80px;color:var(--w);font:400 12px var(--m)}
 #lb{position:fixed;inset:0;z-index:200;background:rgba(8,8,8,.96);display:none;place-items:center;padding:60px 16px}#lb.on{display:grid}
 #lb img{max-width:min(94vw,1500px);max-height:80vh;object-fit:contain;background:#fff}
@@ -251,9 +252,10 @@ const ld=$('#ld');
 const mt=$('#mt');mt.append(...$$('[data-n]',mt).map(n=>{const c=n.cloneNode(true);c.setAttribute('aria-hidden','true');c.removeAttribute('data-n');return c}));
 // nav
 const nv=$('#nv'),bg=$('#bg');
-bg.onclick=()=>{const o=document.body.classList.toggle('menu');lenis&&(o?lenis.stop():lenis.start())};
-addEventListener('scroll',()=>nv.classList.toggle('s',scrollY>40),{passive:true});
-$$('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{const t=$(a.getAttribute('href'));if(!t)return;e.preventDefault();document.body.classList.remove('menu');lenis&&lenis.start();lenis?lenis.scrollTo(t,{duration:1.4}):t.scrollIntoView({behavior:rm?'auto':'smooth'})}));
+const setMenu=o=>{document.body.classList.toggle('menu',o);bg.setAttribute('aria-expanded',String(o));lenis&&(o?lenis.stop():lenis.start())};
+bg.setAttribute('aria-expanded','false');bg.onclick=()=>setMenu(!document.body.classList.contains('menu'));
+addEventListener('scroll',()=>{nv.classList.toggle('s',scrollY>40);if(innerWidth<=860&&document.body.classList.contains('menu'))setMenu(false)},{passive:true});
+$$('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{const t=$(a.getAttribute('href'));if(!t)return;e.preventDefault();setMenu(false);lenis?lenis.scrollTo(t,{duration:1.4}):t.scrollIntoView({behavior:rm?'auto':'smooth'})}));
 // active link
 const links=$$('.nl a:not(.cta)'),secs=['home','about','philosophy','services','system','clients','results','approach'];
 const act=()=>{let cur='home';secs.forEach(id=>{const r=document.getElementById(id).getBoundingClientRect();if(r.top<innerHeight*.45)cur=id});links.forEach(l=>l.classList.toggle('on',l.getAttribute('href')==='#'+cur))};
